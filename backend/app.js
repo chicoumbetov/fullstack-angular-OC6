@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
 
@@ -15,7 +16,20 @@ app.use((req, res, next) => {
     // d'envoyer des requêtes avec les méthodes mentionnées ( GET ,POST , etc.).
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
-})
+});
+
+// extraire l'objet JSON de la demande
+// transformer le core de la requets en objet js utilisable
+app.use(bodyParser.json());
+
+// gérer la demande POST provenant de l'application front-end
+// receive object with data from frontend
+app.post('/api/stuff', (req, res, next) => {
+    console.log(req.body);
+    res.status(201).json({
+        message: 'Objet créé !'
+    })
+});
 
 // middleware avec un groupe d'articles 
 // avec le schéma de données spécifique requis par le front-end
