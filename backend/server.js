@@ -44,6 +44,9 @@ const server = http.createServer(app);
 // un écouteur d'évènements est également enregistré, 
 // consignant le port ou le canal nommé 
 // sur lequel le serveur s'exécute dans la console.
+
+// recupère le port 3000 et écoute de ce qui se passe.
+// чувак на стоящий на стрёме
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();

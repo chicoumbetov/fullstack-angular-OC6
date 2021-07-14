@@ -1,7 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const app = express();
+
+mongoose.connect('mongodb+srv://chicoumbetov:skypefacebook@cluster0.sb2y0.mongodb.net/test?retryWrites=true&w=majority',
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 // middleware with CORS pour que front 4200 et back 3000 puissent communiquer entre eux.
 app.use((req, res, next) => {
@@ -19,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 // extraire l'objet JSON de la demande
-// transformer le core de la requets en objet js utilisable
+// transformer le core de la requests en objet js utilisable
 app.use(bodyParser.json());
 
 // gérer la demande POST provenant de l'application front-end
@@ -58,3 +65,4 @@ app.use('/api/stuff', (req, res, next) => {
   });
 
 module.exports = app;
+
