@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const Thing = require('./models/thing');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://chicoumbetov:skypefacebook@cluster0.sb2y0.mongodb.net/test?retryWrites=true&w=majority',
+// cour - name of database
+mongoose.connect('mongodb+srv://chicoumbetov:skypefacebook@cluster0.sb2y0.mongodb.net/cour?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -31,38 +33,35 @@ app.use(bodyParser.json());
 
 // gérer la demande POST provenant de l'application front-end
 // receive object with data from frontend
+// post using from mongo db
 app.post('/api/stuff', (req, res, next) => {
-    console.log(req.body);
-    res.status(201).json({
-        message: 'Objet créé !'
-    })
+  // en ayant supprimé en amont le faux_id envoyé par le front-end
+  delete req.body._id;  
+  // créez une instance de votre modèle Thing 
+  // en lui passant un objet JavaScript contenant toutes les 
+  // informations requises du corps de requête analysé
+  const thing = new Thing({
+    ...req.body
+  });
+  // save copied info to data base
+  thing.save()
+    .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
+    .catch(error => res.status(400).json({ error }));
 });
 
 // middleware avec un groupe d'articles 
 // avec le schéma de données spécifique requis par le front-end
-app.use('/api/stuff', (req, res, next) => {
-    const stuff = [
-      {
-        _id: 'oeihfzeoi',
-        title: 'Mon premier objet',
-        description: 'Les infos de mon premier objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-        price: 4900,
-        userId: 'qsomihvqios',
-      },
-      {
-        _id: 'oeihfzeomoihi',
-        title: 'Mon deuxième objet',
-        description: 'Les infos de mon deuxième objet',
-        imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-        price: 2900,
-        userId: 'qsomihvqios',
-      },
-    ];
-    // Nous envoyons ensuite ces articles sous la forme de données JSON, 
-    // avec un code 200 pour une demande réussie.
-    res.status(200).json(stuff);
-  });
+// nous utilisons la méthode get() pour répondre uniquement aux demandes GET à cet endpoint
+app.use('/api/stuff/:id', (req, res, next) => {
+  Thing.findOne({ _id: req.params.id })
+    .then(thing => res.status(200).json(thing))
+    .catch(error => res.status(404).json({ error }));
+});
+
+app.get('/api/stuff', (req, res, next) => {
+  Thing.find()
+    .then(things => res.status(200).json(things))
+    .catch(error => res.status(400).json({ error }));
+});
 
 module.exports = app;
-
