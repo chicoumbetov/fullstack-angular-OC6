@@ -49,8 +49,23 @@ app.post('/api/stuff', (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 });
 
+
+
 // middleware avec un groupe d'articles 
-// avec le schéma de données spécifique requis par le front-end
+// avec le schéma de données spécifique requis par le front-
+
+app.put('/api/stuff/:id', (req, res, next) => {
+  Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
+app.delete('/api/stuff/:id', (req, res, next) => {
+  Thing.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
 // nous utilisons la méthode get() pour répondre uniquement aux demandes GET à cet endpoint
 app.use('/api/stuff/:id', (req, res, next) => {
   Thing.findOne({ _id: req.params.id })
